@@ -42,8 +42,6 @@ To get started with MLX_CLIP, follow these steps:
    text_embedding = clip.text_encoder(text)
    ```
 
-
-
 ## Examples 💡
 
 Check out the `example.py` file for a simple example of how to use MLX_CLIP to generate image and text embeddings.
@@ -79,5 +77,64 @@ For any questions or inquiries, feel free to reach out to the project maintainer
 Harper Reed
 - Email: harper@modest.com
 - GitHub: [harperreed](https://github.com/harperreed)
+
+## Web Image Search App
+
+A simple Flask web server (`app.py`) is included for searching and exploring your image dataset using CLIP embeddings and pgvector in Supabase Postgres.
+
+### Features
+- **Search bar**: Enter a text query to find similar images using CLIP embeddings.
+- **3x3 grid**: Results are shown in a 3x3 grid, displaying images in their natural size (with a max-height for layout consistency).
+- **Image neighbors**: Click any image to see a 3x3 grid of its most similar (nearest neighbor) images.
+- **Image source**: Images are loaded from the `assets/` directory.
+
+### Requirements
+- Python packages: `Flask`, `psycopg2`, `python-dotenv`, `mlx_clip`, and their dependencies.
+- A Supabase Postgres database with the `pgvector` extension enabled and populated with image embeddings.
+
+### Usage
+1. Install requirements:
+   ```bash
+   pip install flask psycopg2-binary python-dotenv
+   ```
+2. Make sure your `.env` file contains your `SUPABASE_DB_URL`.
+3. Run the server:
+   ```bash
+   python app.py
+   ```
+4. Open [http://localhost:5000](http://localhost:5000) in your browser.
+5. Enter a search query or click an image to explore similar images.
+
+## Embedding Storage and Search Scripts
+
+### encode_and_store.py
+This script scans a directory of images, encodes each image using the MLX_CLIP model, and stores the resulting embeddings in a Supabase Postgres database with the `pgvector` extension. Each embedding is stored alongside its file name, enabling efficient vector search and retrieval later.
+
+- **How it works:**
+  - Loads your Supabase database credentials from a `.env` file.
+  - Connects directly to the database to create the `image_embeddings` table if it doesn't exist.
+  - Encodes each image in the `assets/` directory and inserts its embedding and file name into the database.
+
+- **Usage:**
+  ```bash
+  python encode_and_store.py
+  ```
+
+### search_images.py
+This script allows you to search for images by text query. It encodes the query using the MLX_CLIP model, then searches the Supabase Postgres database for the most similar image embeddings using vector similarity (via pgvector), and prints the matching file names in order of similarity.
+
+- **How it works:**
+  - Loads your Supabase database credentials from a `.env` file.
+  - Encodes the provided text query.
+  - Performs a vector similarity search in the database and returns the top matches.
+
+- **Usage:**
+  ```bash
+  python search_images.py "your search query"
+  ```
+
+Both scripts rely on Supabase Postgres with the `pgvector` extension for efficient storage and search of image embeddings.
+
+---
 
 Happy coding with MLX_CLIP! 😄💻🚀
